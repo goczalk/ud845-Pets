@@ -72,14 +72,10 @@ public class CatalogActivity extends AppCompatActivity {
      * the pets database.
      */
     private void displayDatabaseInfo() {
-        // Create and/or open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         // Perform this raw SQL query "SELECT * FROM pets"
         // to get a Cursor that contains all rows from the pets table.
 //        Cursor cursor = db.rawQuery("SELECT * FROM " + PetContract.PetEntry.TABLE_NAME, null);
-
-        Cursor cursor = db.query(PetEntry.TABLE_NAME, null, null, null, null, null, null);
 
 //        Cursor cursor = db.query(
 //        FeedEntry.TABLE_NAME,   // The table to query
@@ -90,6 +86,15 @@ public class CatalogActivity extends AppCompatActivity {
 //                null,                   // don't filter by row groups
 //                sortOrder               // The sort order
 //    );
+
+        String[] projection = {
+                PetEntry._ID,
+                PetEntry.COLUMN_PET_NAME,
+                PetEntry.COLUMN_PET_BREED,
+                PetEntry.COLUMN_PET_GENDER,
+                PetEntry.COLUMN_PET_WEIGHT
+        };
+        Cursor cursor = getContentResolver().query(PetEntry.CONTENT_URI, projection, null, null, null);
 
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
