@@ -92,6 +92,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
         else{
             setTitle(R.string.editor_activity_title_new_pet);
+            invalidateOptionsMenu();
         }
 
         // Find all relevant views that we will need to read user input from
@@ -145,6 +146,17 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 mGender = 0; // Unknown
             }
         });
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        // If this is a new pet, hide the "Delete" menu item.
+        if (!isInEditorState()) {
+            MenuItem menuItem = menu.findItem(R.id.action_delete);
+            menuItem.setVisible(false);
+        }
+        return true;
     }
 
     @Override
