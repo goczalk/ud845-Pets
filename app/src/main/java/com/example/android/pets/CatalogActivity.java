@@ -76,11 +76,14 @@ public class CatalogActivity extends AppCompatActivity {
         cursor = getContentResolver().query(PetEntry.CONTENT_URI, null, null, null, null);
 
         // Find ListView to populate
-        ListView listView = (ListView) findViewById(R.id.list);
+        ListView petListView = (ListView) findViewById(R.id.list);
+        View emptyView = findViewById(R.id.empty_view);
+        petListView.setEmptyView(emptyView);
+
         // Setup cursor adapter using cursor from last step
         PetCursorAdapter petCursorAdapter = new PetCursorAdapter(this, cursor);
         // Attach cursor adapter to the ListView
-        listView.setAdapter(petCursorAdapter);
+        petListView.setAdapter(petCursorAdapter);
     }
 
     @Override
