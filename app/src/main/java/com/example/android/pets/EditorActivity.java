@@ -161,11 +161,24 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     private void savePet() {
+        String name = mNameEditText.getText().toString().trim();
+        String breed = mBreedEditText.getText().toString().trim();
+
+        if(TextUtils.isEmpty(name) || TextUtils.isEmpty(breed)){
+            return;
+        }
+
+        int weight = 0;
+        String weightString = mWeightEditText.getText().toString().trim();
+        if(!TextUtils.isEmpty(weightString)){
+            weight = Integer.parseInt(weightString);
+        }
+
         ContentValues values = new ContentValues();
-        values.put(PetEntry.COLUMN_PET_NAME, mNameEditText.getText().toString().trim());
-        values.put(PetEntry.COLUMN_PET_BREED, mBreedEditText.getText().toString().trim());
+        values.put(PetEntry.COLUMN_PET_NAME, name);
+        values.put(PetEntry.COLUMN_PET_BREED, breed);
         values.put(PetEntry.COLUMN_PET_GENDER, mGender);
-        values.put(PetEntry.COLUMN_PET_WEIGHT, Integer.parseInt(mWeightEditText.getText().toString().trim()));
+        values.put(PetEntry.COLUMN_PET_WEIGHT, weight);
 
         if(isInEditorState()){
             int rowsUpdated = getContentResolver().update(currentPetUri, values, null, null);
