@@ -37,8 +37,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.android.pets.data.PetContract;
-
 import static com.example.android.pets.data.PetContract.*;
 
 /**
@@ -75,12 +73,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         currentPetUri = intent.getData();
 
         //null because it is not opened with clicking on item!
-        if(currentPetUri == null){
-            setTitle(R.string.editor_activity_title_new_pet);
-        }
-        else{
+        if(isInEditorState()){
             setTitle(R.string.editor_activity_title_edit_pet);
             getLoaderManager().initLoader(PET_EDIT_LOADER, null, this);
+        }
+        else{
+            setTitle(R.string.editor_activity_title_new_pet);
         }
 
         // Find all relevant views that we will need to read user input from
@@ -145,7 +143,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                insertPet();
+                savePet();
                 // Exit activity
                 finish();
                 return true;
@@ -162,22 +160,34 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         return super.onOptionsItemSelected(item);
     }
 
-    private void insertPet() {
+    private void savePet() {
         ContentValues values = new ContentValues();
         values.put(PetEntry.COLUMN_PET_NAME, mNameEditText.getText().toString().trim());
         values.put(PetEntry.COLUMN_PET_BREED, mBreedEditText.getText().toString().trim());
         values.put(PetEntry.COLUMN_PET_GENDER, mGender);
         values.put(PetEntry.COLUMN_PET_WEIGHT, Integer.parseInt(mWeightEditText.getText().toString().trim()));
 
-        Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
+        if(isInEditorState()){
+            int rowsUpdated = getContentResolver().update(currentPetUri, values, null, null);
+            if(rowsUpdated == 0){
+                Toast.makeText(this, getString(R.string.editor_edit_pet_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the insertion was successful and we can display a toast.
+                Toast.makeText(this, R.string.pet_saved, Toast.LENGTH_SHORT).show();
+            }
+        }
+        else {
+            Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
 
-        if (newUri == null) {
-            // If the new content URI is null, then there was an error with insertion.
-            Toast.makeText(this, getString(R.string.editor_insert_pet_failed),
-                    Toast.LENGTH_SHORT).show();
-        } else {
-            // Otherwise, the insertion was successful and we can display a toast.
-            Toast.makeText(this, R.string.pet_saved, Toast.LENGTH_SHORT).show();
+            if (newUri == null) {
+                // If the new content URI is null, then there was an error with insertion.
+                Toast.makeText(this, getString(R.string.editor_add_pet_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the insertion was successful and we can display a toast.
+                Toast.makeText(this, R.string.pet_added, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -229,5 +239,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mBreedEditText.setText(null);
         mWeightEditText.setText(null);
         mGenderSpinner.setSelection(0);
+    }
+
+    private boolean isInEditorState(){
+        if(currentPetUri != null){
+            return true;
+        }
+        return false;
     }
 }
