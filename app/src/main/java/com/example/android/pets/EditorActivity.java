@@ -213,7 +213,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String name = mNameEditText.getText().toString().trim();
         String breed = mBreedEditText.getText().toString().trim();
 
-        if(TextUtils.isEmpty(name) || TextUtils.isEmpty(breed)){
+        if(TextUtils.isEmpty(name)){
             return;
         }
 
@@ -353,8 +353,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Show dialog that there are unsaved changes
         showUnsavedChangesDialog(discardButtonClickListener);
     }
-
-
 
     private void showDeleteConfirmationDialog() {
         // Create an AlertDialog.Builder and set the message, and click listeners
