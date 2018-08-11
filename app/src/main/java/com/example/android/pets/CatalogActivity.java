@@ -15,8 +15,11 @@
  */
 package com.example.android.pets;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -25,14 +28,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.android.pets.data.PetContract.PetEntry;
 
 /**
  * Displays list of pets that were entered and stored in the app.
  */
-public class CatalogActivity extends AppCompatActivity {
+public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int PET_LOADER = 1;
+    private PetCursorAdapter petCursorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,41 +54,17 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
 
-        displayDatabaseInfo();
-    }
-
-    //when be back from editorsActivity
-    @Override
-    protected void onStart() {
-        super.onStart();
-        displayDatabaseInfo();
-    }
-
-    /**
-     * Temporary helper method to display information in the onscreen TextView about the state of
-     * the pets database.
-     */
-    private void displayDatabaseInfo() {
-//        String[] projection = {
-//                PetEntry._ID,
-//                PetEntry.COLUMN_PET_NAME,
-//                PetEntry.COLUMN_PET_BREED,
-//                PetEntry.COLUMN_PET_GENDER,
-//                PetEntry.COLUMN_PET_WEIGHT
-//        };
-
-        Cursor cursor = null;
-        cursor = getContentResolver().query(PetEntry.CONTENT_URI, null, null, null, null);
-
         // Find ListView to populate
         ListView petListView = (ListView) findViewById(R.id.list);
         View emptyView = findViewById(R.id.empty_view);
         petListView.setEmptyView(emptyView);
 
         // Setup cursor adapter using cursor from last step
-        PetCursorAdapter petCursorAdapter = new PetCursorAdapter(this, cursor);
+        petCursorAdapter = new PetCursorAdapter(this, null);
         // Attach cursor adapter to the ListView
         petListView.setAdapter(petCursorAdapter);
+
+        getLoaderManager().initLoader(PET_LOADER, null, this);
     }
 
     @Override
@@ -119,7 +100,25 @@ public class CatalogActivity extends AppCompatActivity {
         values.put(PetEntry.COLUMN_PET_WEIGHT, 7);
 
         getContentResolver().insert(PetEntry.CONTENT_URI, values);
+    }
 
-        displayDatabaseInfo();
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String[] projection = {
+                PetEntry._ID,
+                PetEntry.COLUMN_PET_NAME,
+                PetEntry.COLUMN_PET_BREED
+        };
+        return new CursorLoader(this, PetEntry.CONTENT_URI, projection, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        petCursorAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        petCursorAdapter.swapCursor(null);
     }
 }
