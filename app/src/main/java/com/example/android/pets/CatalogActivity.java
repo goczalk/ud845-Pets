@@ -38,7 +38,6 @@ import com.example.android.pets.data.PetContract.PetEntry;
  * Displays list of pets that were entered and stored in the app.
  */
 public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
-
     private static final int PET_LOADER = 1;
     private PetCursorAdapter petCursorAdapter;
 
